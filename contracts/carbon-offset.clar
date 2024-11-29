@@ -102,3 +102,19 @@
     (ok credit-id)
   )
 )
+
+;; Validates a carbon offset credit by a validator
+(define-public (validate-credit (credit-id uint) (validator-id uint) (new-status (string-ascii 20)))
+  (let
+    (
+      (credit (unwrap! (get-credit credit-id) (err err-not-found)))
+      (validator (unwrap! (get-validator validator-id) (err err-not-found)))
+    )
+    (asserts! (is-eq (get address validator) tx-sender) (err err-unauthorized))
+    (asserts! (is-eq (get status credit) "pending") (err err-invalid-status))
+    (map-set credits { credit-id: credit-id }
+      (merge credit { status: new-status, validator: validator-id })
+    )
+    (ok true)
+  )
+)
