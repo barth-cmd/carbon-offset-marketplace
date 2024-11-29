@@ -12,3 +12,8 @@
 (define-constant err-credit-not-available (err u105))
 (define-constant err-invalid-status (err u106))
 (define-constant err-transfer-failed (err u107))
+
+;; Data Variables
+(define-data-var next-credit-id uint u0)
+(define-data-var next-validator-id uint u0)
+(define-data-var platform-fee uint u25) ;; 2.5% fee
