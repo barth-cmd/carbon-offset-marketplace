@@ -55,3 +55,25 @@
 (define-private (calculate-fee (amount uint))
   (/ (* amount (var-get platform-fee)) u1000)
 )
+
+;; Read-Only Functions
+;; Retrieves the details of a specific credit by its ID
+(define-read-only (get-credit (credit-id uint))
+  (match (map-get? credits { credit-id: credit-id })
+    credit (ok credit)
+    (err err-not-found)
+  )
+)
+
+;; Retrieves the balance of a specific user
+(define-read-only (get-balance (user principal))
+  (default-to u0 (map-get? balances user))
+)
+
+;; Retrieves the details of a specific validator by its ID
+(define-read-only (get-validator (validator-id uint))
+  (match (map-get? validators { validator-id: validator-id })
+    validator (ok validator)
+    (err err-not-found)
+  )
+)
