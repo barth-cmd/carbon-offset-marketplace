@@ -219,3 +219,29 @@
     )
   )
 )
+
+;; Updates the reputation of a validator
+(define-public (update-validator-reputation (validator-id uint) (new-reputation uint))
+  (let
+    (
+      (validator (unwrap! (get-validator validator-id) (err err-not-found)))
+    )
+    (asserts! (is-eq tx-sender contract-owner) (err err-owner-only))
+    (asserts! (and (>= new-reputation u0) (<= new-reputation u100)) (err err-invalid-amount))
+    
+    (map-set validators { validator-id: validator-id }
+      (merge validator { reputation: new-reputation })
+    )
+    (ok true)
+  )
+)
+
+;; Updates the platform fee
+(define-public (update-platform-fee (new-fee uint))
+  (begin
+    (asserts! (is-eq tx-sender contract-owner) (err err-owner-only))
+    (asserts! (and (>= new-fee u0) (<= new-fee u100)) (err err-invalid-amount))
+    (var-set platform-fee new-fee)
+    (ok true)
+  )
+)
