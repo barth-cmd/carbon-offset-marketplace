@@ -178,3 +178,44 @@
     )
   )
 )
+
+;; Retires a specified amount of credits
+(define-public (retire-credits (amount uint))
+  (let
+    (
+      (user-balance (get-balance tx-sender))
+    )
+    (asserts! (> amount u0) (err err-invalid-amount))
+    (asserts! (>= user-balance amount) (err err-insufficient-balance))
+    
+    (map-set balances tx-sender
+      (- user-balance amount)
+    )
+    
+    (ok true)
+  )
+)
+
+;; Adds a new validator to the system
+(define-public (add-validator (name (string-ascii 50)))
+  (begin
+    ;; Additional input validation
+    (asserts! (> (len name) u0) (err err-invalid-amount))
+    (asserts! (is-eq tx-sender contract-owner) (err err-owner-only))
+    
+    (let
+      (
+        (validator-id (var-get next-validator-id))
+      )
+      (map-set validators { validator-id: validator-id }
+        {
+          address: tx-sender,
+          name: name,
+          reputation: u100
+        }
+      )
+      (var-set next-validator-id (+ validator-id u1))
+      (ok validator-id)
+    )
+  )
+)
