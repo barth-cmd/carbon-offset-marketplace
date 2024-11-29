@@ -118,3 +118,37 @@
     (ok true)
   )
 )
+
+;; Allows a user to buy a carbon offset credit
+(define-public (buy-credit (credit-id uint) (amount uint))
+  (let
+    (
+      (credit (unwrap! (get-credit credit-id) (err err-not-found)))
+      (total-cost (* amount (get price credit)))
+      (fee (calculate-fee total-cost))
+      (seller (get owner credit))
+    )
+    (asserts! (is-eq (get status credit) "validated") (err err-invalid-status))
+    (asserts! (<= amount (get amount credit)) (err err-credit-not-available))
+    (asserts! (>= (stx-get-balance tx-sender) total-cost) (err err-insufficient-balance))
+    
+    ;; Use explicit error handling for transfers
+    (if (and 
+          (transfer-stx-internal total-cost tx-sender seller)
+          (transfer-stx-internal fee seller contract-owner)
+        )
+        (begin
+          (map-set credits { credit-id: credit-id }
+            (merge credit { amount: (- (get amount credit) amount) })
+          )
+          
+          (map-set balances tx-sender
+            (+ (get-balance tx-sender) amount)
+          )
+          
+          (ok true)
+        )
+        (err err-transfer-failed)
+    )
+  )
+)
