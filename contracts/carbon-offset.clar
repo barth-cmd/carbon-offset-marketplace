@@ -41,3 +41,17 @@
     reputation: uint
   }
 )
+
+;; Private Functions
+;; Transfers STX internally between sender and recipient
+(define-private (transfer-stx-internal (amount uint) (sender principal) (recipient principal))
+  (match (stx-transfer? amount sender recipient)
+    success true
+    error false
+  )
+)
+
+;; Calculates the platform fee based on the given amount
+(define-private (calculate-fee (amount uint))
+  (/ (* amount (var-get platform-fee)) u1000)
+)
