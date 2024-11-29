@@ -77,3 +77,28 @@
     (err err-not-found)
   )
 )
+
+;; Public Functions
+;; Creates a new carbon offset credit
+(define-public (create-credit (amount uint) (price uint) (metadata (string-ascii 256)))
+  (let
+    (
+      (credit-id (var-get next-credit-id))
+      (new-credit {
+        owner: tx-sender,
+        amount: amount,
+        price: price,
+        status: "pending",
+        validator: u0,
+        metadata: metadata
+      })
+    )
+    ;; Additional input validation
+    (asserts! (> amount u0) (err err-invalid-amount))
+    (asserts! (> price u0) (err err-invalid-amount))
+    
+    (map-set credits { credit-id: credit-id } new-credit)
+    (var-set next-credit-id (+ credit-id u1))
+    (ok credit-id)
+  )
+)
