@@ -152,3 +152,29 @@
     )
   )
 )
+
+;; Transfers credits from one user to another
+(define-public (transfer-credits (recipient principal) (amount uint))
+  (begin
+    ;; Explicit validation checks
+    (asserts! (not (is-eq tx-sender recipient)) (err err-unauthorized))
+    (asserts! (> amount u0) (err err-invalid-amount))
+    
+    (let
+      (
+        (sender-balance (get-balance tx-sender))
+        (recipient-balance (get-balance recipient))
+      )
+      (asserts! (>= sender-balance amount) (err err-insufficient-balance))
+      
+      (map-set balances tx-sender
+        (- sender-balance amount)
+      )
+      (map-set balances recipient
+        (+ recipient-balance amount)
+      )
+      
+      (ok true)
+    )
+  )
+)
