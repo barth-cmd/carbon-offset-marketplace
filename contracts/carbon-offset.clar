@@ -17,3 +17,27 @@
 (define-data-var next-credit-id uint u0)
 (define-data-var next-validator-id uint u0)
 (define-data-var platform-fee uint u25) ;; 2.5% fee
+
+;; Principal Variables
+(define-map credits
+  { credit-id: uint }
+  {
+    owner: principal,
+    amount: uint,
+    price: uint,
+    status: (string-ascii 20),
+    validator: uint,
+    metadata: (string-ascii 256)
+  }
+)
+
+(define-map balances principal uint)
+
+(define-map validators
+  { validator-id: uint }
+  {
+    address: principal,
+    name: (string-ascii 50),
+    reputation: uint
+  }
+)
